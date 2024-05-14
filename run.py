@@ -65,28 +65,29 @@ def batch_end_callback(trainer, model, train_dataset, test_dataset):
 # -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    output_file = "experiment_results.txt"
+    with open(output_file, "w") as f_out:
+        for i in range(10):  # Run experiment 10 times
+            config = get_config()
+            setup_logging(config)
+            set_seed(config.system.init_seed + i)  # Change seed for each run
 
-    config = get_config()
-    setup_logging(config)
+            train_dataset = ChickenRabbitDataset(config.data, split='train', seed=random.randint(0, 10000))
+            test_dataset = ChickenRabbitDataset(config.data, split='test', seed=random.randint(0, 10000))
 
-    # TODO: try different seed for model
-    set_seed(config.system.init_seed)
+            config.model.vocab_size = train_dataset.get_vocab_size()
+            config.model.block_size = train_dataset.get_block_size()
+            model = GPT(config.model)
+            trainer = Trainer(config.trainer, model, train_dataset, test_dataset)
+            trainer.set_callback('on_batch_end', batch_end_callback)
+            stop_iteration = trainer.run()
 
-    # TODO: try different seed to adjust the data order of train/test-set
-    train_dataset = ChickenRabbitDataset(config.data, split='train', seed=0)
-    test_dataset  = ChickenRabbitDataset(config.data, split='test', seed=0)
-
-    # set the correct vocab size: 10, block size: chickenrabbit -> 10, gcd -> 6
-    config.model.vocab_size = train_dataset.get_vocab_size()
-    config.model.block_size = train_dataset.get_block_size()
-    model = GPT(config.model)
-    trainer = Trainer(config.trainer, model, train_dataset, test_dataset)
-    trainer.set_callback('on_batch_end', batch_end_callback)
-    stop_iteration = trainer.run()
-    if stop_iteration != -1:
-        print(f'The final iteration of this round is {stop_iteration}!')
-    else:
-        print('It cannot reach 0.9 acc within max_iteration steps...')
+            if stop_iteration != -1:
+                f_out.write(f'Round {i+1}: The final iteration of this round is {stop_iteration}\n')
+                print(f'Round {i+1}: The final iteration of this round is {stop_iteration}!')
+            else:
+                f_out.write(f'Round {i+1}: It cannot reach 0.9 acc within max_iteration steps...\n')
+                print(f'Round {i+1}: It cannot reach 0.9 acc within max_iteration steps...')
 
 
     
