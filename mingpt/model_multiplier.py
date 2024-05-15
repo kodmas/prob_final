@@ -163,7 +163,8 @@ class GPT(nn.Module):
     def _init_weights(self, module):
         # TODO:  you may choose different initialization
         if isinstance(module, nn.Linear):
-            torch.nn.init.xavier_uniform_(module.weight, gain=1.0)
+            # torch.nn.init.xavier_uniform_(module.weight, gain=1.0)
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
             if module.bias is not None:
                 torch.nn.init.zeros_(module.bias)
         elif isinstance(module, nn.Embedding):

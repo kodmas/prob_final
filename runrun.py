@@ -7,8 +7,8 @@ import nltk
 np.set_printoptions(threshold=np.inf)
 
 import torch
-from ChickenRabbit import ChickenRabbitDataset, eval_split
-# from GCD import GCDDataset, eval_split
+# from ChickenRabbit import ChickenRabbitDataset, eval_split
+from GCD import GCDDataset, eval_split
 from torch.utils.data.dataloader import DataLoader
 torch.set_printoptions(profile="full")
 
@@ -29,7 +29,7 @@ def get_config():
     C.system.work_dir = './test'
 
     # data
-    C.data = ChickenRabbitDataset.get_default_config()
+    C.data = GCDDataset.get_default_config()
 
     # model
     C.model = GPT.get_default_config()
@@ -37,7 +37,7 @@ def get_config():
     
     # trainer
     C.trainer = Trainer.get_default_config()
-    C.trainer.task = "ChickenRabbit" # or gcd
+    C.trainer.task = "gcd" # or gcd
     return C
 
 def batch_end_callback(trainer, model, train_dataset, test_dataset):
@@ -72,8 +72,8 @@ if __name__ == '__main__':
             setup_logging(config)
             set_seed(config.system.init_seed)  # Change seed for each run
 
-            train_dataset = ChickenRabbitDataset(config.data, split='train', seed=random.randint(0, 10000))
-            test_dataset = ChickenRabbitDataset(config.data, split='test', seed=random.randint(0, 10000))
+            train_dataset = GCDDataset(config.data, split='train', seed=random.randint(0, 10000))
+            test_dataset = GCDDataset(config.data, split='test', seed=random.randint(0, 10000))
 
             config.model.vocab_size = train_dataset.get_vocab_size()
             config.model.block_size = train_dataset.get_block_size()
