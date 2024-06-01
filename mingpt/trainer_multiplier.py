@@ -17,7 +17,7 @@ class Trainer:
     def get_default_config():
         C = CN()
         # device to train on
-        C.device = 'cuda'
+        C.device = 'cpu'
         # dataloder parameters
         C.num_workers = 4
         # optimizer parameters

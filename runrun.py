@@ -67,13 +67,13 @@ def batch_end_callback(trainer, model, train_dataset, test_dataset):
 if __name__ == '__main__':
     output_file = "experiment_results_CR_norm_Q1_1_21~30.txt"
     with open(output_file, "w") as f_out:
-        for i in range(10):  # Run experiment 10 times
+        for i in range(30):  # Run experiment 10 times
             config = get_config()
             setup_logging(config)
             set_seed(config.system.init_seed)  # Change seed for each run
 
-            train_dataset = GCDDataset(config.data, split='train', seed=random.randint(0, 10000))
-            test_dataset = GCDDataset(config.data, split='test', seed=random.randint(0, 10000))
+            train_dataset = GCDDataset(config.data, split='train', seed=0)
+            test_dataset = GCDDataset(config.data, split='test', seed=i)
 
             config.model.vocab_size = train_dataset.get_vocab_size()
             config.model.block_size = train_dataset.get_block_size()
