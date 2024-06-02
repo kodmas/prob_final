@@ -65,7 +65,7 @@ def batch_end_callback(trainer, model, train_dataset, test_dataset):
 # -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    output_file = "experiment_results_CR_norm_Q1_1_21~30.txt"
+    output_file = "experiment_results_Q2_1_GCD.txt"
     with open(output_file, "w") as f_out:
         for i in range(30):  # Run experiment 10 times
             config = get_config()
@@ -73,7 +73,7 @@ if __name__ == '__main__':
             set_seed(config.system.init_seed)  # Change seed for each run
 
             train_dataset = GCDDataset(config.data, split='train', seed=0)
-            test_dataset = GCDDataset(config.data, split='test', seed=i)
+            test_dataset = GCDDataset(config.data, split='test', seed=0)
 
             config.model.vocab_size = train_dataset.get_vocab_size()
             config.model.block_size = train_dataset.get_block_size()
@@ -83,10 +83,10 @@ if __name__ == '__main__':
             stop_iteration = trainer.run()
 
             if stop_iteration != -1:
-                f_out.write(f'Round {20+i+1}: The final iteration of this round is {stop_iteration}\n')
+                f_out.write(f'Round {i+1}: The final iteration of this round is {stop_iteration}\n')
                 print(f'Round {i+1}: The final iteration of this round is {stop_iteration}!')
             else:
-                f_out.write(f'Round {20+i+1}: It cannot reach 0.9 acc within max_iteration steps...\n')
+                f_out.write(f'Round {i+1}: It cannot reach 0.9 acc within max_iteration steps...\n')
                 print(f'Round {i+1}: It cannot reach 0.9 acc within max_iteration steps...')
 
 

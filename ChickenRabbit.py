@@ -46,7 +46,17 @@ class ChickenRabbitDataset(Dataset):
         perm = torch.tensor(data, dtype=torch.long)
 
         num_test = min(int(len(perm)*0.2), 500) # 20% of the whole dataset, or only up to 500
-        self.ixes = perm[:num_test] if split == 'test' else perm[num_test:]
+        if split == 'test':
+            self.ixes = perm[:num_test]
+        else:
+            self.ixes = perm[num_test:]
+            # Apply a specific pattern to the training data
+            self.apply_pattern_to_training_data()
+
+    def apply_pattern_to_training_data(self):
+        # Example pattern: Sort by total legs in descending order
+        self.ixes = self.ixes[torch.argsort(self.ixes[:, 1], descending=True)]
+
 
     def get_vocab_size(self):
         return 10 # digits 0..9
