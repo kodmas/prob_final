@@ -18,22 +18,32 @@ class GCDDataset(Dataset):
         return C
     
     def is_prime(self, x):
-        if x > 1:
-            for i in range(2, x):
+        if (x > 1):
+            divisor = 2
+            for i in range(divisor,x):
                 if (x % i) == 0:
                     return False
         else:
             return False
+        
         return True
     
     def gcd(self):
         data = []
+        prime_data = [] # (a, b) = (a, 2*a)
         for a in range(1, 100):
-            for b in range(a + 1, 100):
+            tmp = []
+            for b in range(a+1, 100):
                 c = math.gcd(a, b)
                 res = f"{a:02}{b:02}{c:02}"
-                data.append([int(x) for x in res])
-        return data
+
+                if self.is_prime(a) and b % a == 0:
+                    tmp.append([int(x) for x in res])
+                else:
+                    data.append([int(x) for x in res])
+            if len(tmp) > 0:
+                prime_data.append(tmp)
+        return data, prime_data
     
     def interleave_batches(self, data, batch_size):
         reordered_data = []
