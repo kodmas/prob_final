@@ -77,9 +77,6 @@ class GCDDataset(Dataset):
         test_data = test_data + data[:num_test]
         train_data = train_data + data[num_test:]
 
-        test_data = torch.tensor(test_data, dtype=torch.long)
-        train_data = torch.tensor(train_data, dtype=torch.long)
-
         if split == 'train':
             train_data.sort(key=lambda x: 10*x[4]+x[5])  # Sort by GCD value
             train_data = self.interleave_batches(train_data, 64)  # Interleave for batch diversity
@@ -88,7 +85,15 @@ class GCDDataset(Dataset):
         elif split == 'test':
             self.data = test_data
 
-        self.ixes = torch.tensor(self.data, dtype=torch.long)
+        test_data = torch.tensor(test_data, dtype=torch.long)
+        train_data = torch.tensor(train_data, dtype=torch.long)
+        if split == 'train':
+            self.ixes = train_data
+        elif split == 'test':
+            self.ixes = test_data
+        else:
+            raise ValueError(f"Invalid split: {split}")
+        # self.ixes = torch.tensor(self.data, dtype=torch.long)
 
     def get_vocab_size(self):
         return 10  # digits 0..9
