@@ -51,14 +51,24 @@ class GCDDataset(Dataset):
         self.split = split  # train/test
 
         data = self.gcd()
+        self.config.ndigit = 2
+        data, prime_data = self.gcd()
 
-        # Shuffle the entire data with fixed seed for consistent splitting
+        test_data, train_data = [], []
+        
         random.Random(seed).shuffle(data)
+        for l in prime_data:
+            random.Random(seed).shuffle(l)
+            part = len(l) // 5
+            test_data += l[:part]
+            train_data += l[part:]
 
-        # Split data into train/test datasets
-        num_test = min(int(len(data) * 0.2), 500)  # 20% of the whole dataset, or only up to 500
-        test_data = data[:num_test]
-        train_data = data[num_test:]
+        num_test = min(int(len(data)*0.2), 500) - len(test_data) # 20% of the whole dataset, or only up to 500
+        test_data = test_data + data[:num_test]
+        train_data = train_data + data[num_test:]
+
+        test_data = torch.tensor(test_data, dtype=torch.long)
+        train_data = torch.tensor(train_data, dtype=torch.long)
 
         if split == 'train':
             train_data.sort(key=lambda x: 10*x[4]+x[5])  # Sort by GCD value
