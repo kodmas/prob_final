@@ -35,6 +35,16 @@ class GCDDataset(Dataset):
                 data.append([int(x) for x in res])
         return data
     
+    def interleave_batches(self, data, batch_size):
+        reordered_data = []
+        num_batches = len(data) // batch_size + (len(data) % batch_size > 0)
+        for i in range(batch_size):
+            for j in range(num_batches):
+                index = j * batch_size + i
+                if index < len(data):
+                    reordered_data.append(data[index])
+        return reordered_data
+    
     def __init__(self, config, split, seed):
         self.seed = seed
         self.config = config
@@ -50,17 +60,15 @@ class GCDDataset(Dataset):
         test_data = data[:num_test]
         train_data = data[num_test:]
 
-        # Apply the pattern after the split if required
         if split == 'train':
-            # sort the data by abs(a) in descending order
-            train_data = sorted(train_data, key=lambda x: abs(x[0]), reverse=True)
+            train_data.sort(key=lambda x: 10*x[4]+x[5])  # Sort by GCD value
+            train_data = self.interleave_batches(train_data, 64)  # Interleave for batch diversity
             self.data = train_data
+            print("Sorted and interleaved train_data", train_data)
         elif split == 'test':
             self.data = test_data
-        
-        # Convert the data to tensor
+
         self.ixes = torch.tensor(self.data, dtype=torch.long)
-        
 
     def get_vocab_size(self):
         return 10  # digits 0..9
