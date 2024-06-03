@@ -52,12 +52,15 @@ class GCDDataset(Dataset):
 
         # Apply the pattern after the split if required
         if split == 'train':
-            # Optionally sort or process train_data here if needed
-            prime_data = [x for x in train_data if self.is_prime(x[0])]
-            non_prime_data = [x for x in train_data if not self.is_prime(x[0])]
-            prime_data.sort(key=lambda x: x[2])  # Sorting prime data by GCD value
-            train_data = prime_data + non_prime_data  # Reassembling the train data
-        self.ixes = torch.tensor(test_data if split == 'test' else train_data, dtype=torch.long)
+            # sort the data by abs(a) in descending order
+            train_data = sorted(train_data, key=lambda x: abs(x[0]), reverse=True)
+            self.data = train_data
+        elif split == 'test':
+            self.data = test_data
+        
+        # Convert the data to tensor
+        self.ixes = torch.tensor(self.data, dtype=torch.long)
+        
 
     def get_vocab_size(self):
         return 10  # digits 0..9

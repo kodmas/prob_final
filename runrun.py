@@ -67,7 +67,7 @@ def batch_end_callback(trainer, model, train_dataset, test_dataset):
 if __name__ == '__main__':
     output_file = "experiment_results_Q2_1_GCD.txt"
     with open(output_file, "w") as f_out:
-        for i in range(30):  # Run experiment 10 times
+        for i in range(20):  # Run experiment 10 times
             config = get_config()
             setup_logging(config)
             set_seed(config.system.init_seed)  # Change seed for each run
