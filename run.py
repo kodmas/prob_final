@@ -65,14 +65,14 @@ def batch_end_callback(trainer, model, train_dataset, test_dataset):
 # -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    output_file = "experiment_results_Q2_1_CR.txt"
+    output_file = "experiment_results_Q2_2_CR.txt"
     with open(output_file, "w") as f_out:
         for i in range(10):  # Run experiment 10 times
             config = get_config()
             setup_logging(config)
             set_seed(config.system.init_seed)  # Change seed for each run
 
-            train_dataset = ChickenRabbitDataset(config.data, split='train', seed=0)
+            train_dataset = ChickenRabbitDataset(config.data, split='train', seed=i)
             test_dataset = ChickenRabbitDataset(config.data, split='test', seed=0)
 
             config.model.vocab_size = train_dataset.get_vocab_size()
@@ -83,11 +83,11 @@ if __name__ == '__main__':
             stop_iteration = trainer.run()
 
             if stop_iteration != -1:
-                f_out.write(f'Round {i+1}: The final iteration of this round is {stop_iteration}\n')
-                print(f'Round {i+1}: The final iteration of this round is {stop_iteration}!')
+                f_out.write(f'Seed {i+1}: The final iteration of this round is {stop_iteration}\n')
+                print(f'Seed {i+1}: The final iteration of this round is {stop_iteration}!')
             else:
-                f_out.write(f'Round {i+1}: It cannot reach 0.9 acc within max_iteration steps...\n')
-                print(f'Round {i+1}: It cannot reach 0.9 acc within max_iteration steps...')
+                f_out.write(f'Seed {i+1}: It cannot reach 0.9 acc within max_iteration steps...\n')
+                print(f'Seed {i+1}: It cannot reach 0.9 acc within max_iteration steps...')
 
 
     

@@ -34,6 +34,20 @@ class ChickenRabbitDataset(Dataset):
                 d = f"{i+j:03}{2*i+4*j:03}{i:02}{j:02}"
                 data.append([int(dd) for dd in d])
         return data
+    def interleave_batches(self, data, batch_size):
+        reordered_data = []
+        num_batches = len(data) // batch_size + (len(data) % batch_size > 0)
+        for i in range(batch_size):
+            for j in range(num_batches):
+                index = j * batch_size + i
+                if index < len(data):
+                    reordered_data.append(data[index])
+        return reordered_data
+    
+    # def apply_pattern_to_training_data(self):
+    #     # Example pattern: Sort by total legs in descending order
+    #     self.ixes = self.ixes[torch.argsort((100*self.ixes[:, 3] + 10*self.ixes[:,4] + self.ixes[:,5]), descending=True)]
+    #     print("data",self.ixes[:,1]) # print the total legs to verify the pattern
 
     def __init__(self, config, split, seed):
         self.config = config
@@ -46,17 +60,27 @@ class ChickenRabbitDataset(Dataset):
         perm = torch.tensor(data, dtype=torch.long)
 
         num_test = min(int(len(perm)*0.2), 500) # 20% of the whole dataset, or only up to 500
-        if split == 'test':
-            self.ixes = perm[:num_test]
+
+        test_data =  data[:num_test]
+        train_data = data[num_test:]
+
+        if split == 'train':
+            train_data.sort(key=lambda x:abs(10 * x[6] + x[7] - 10 * x[8] - x[9]),reverse=True)
+            # train_data.sort(key=lambda x: 100*x[3]+10*x[4]+x[5],reverse=True)  # Sort by GCD value
+            train_data = self.interleave_batches(train_data, 64)  # Interleave for batch diversity
+            self.data = train_data
+            print("Sorted and interleaved train_data", train_data)
+        elif split == 'test':
+            self.data = test_data
+
+        test_data = torch.tensor(test_data, dtype=torch.long)
+        train_data = torch.tensor(train_data, dtype=torch.long)
+        if split == 'train':
+            self.ixes = train_data
+        elif split == 'test':
+            self.ixes = test_data
         else:
-            self.ixes = perm[num_test:]
-            # Apply a specific pattern to the training data
-            self.apply_pattern_to_training_data()
-
-    def apply_pattern_to_training_data(self):
-        # Example pattern: Sort by total legs in descending order
-        self.ixes = self.ixes[torch.argsort(self.ixes[:, 1], descending=True)]
-
+            raise ValueError(f"Invalid split: {split}")
 
     def get_vocab_size(self):
         return 10 # digits 0..9
