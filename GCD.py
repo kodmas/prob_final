@@ -84,7 +84,7 @@ class GCDDataset(Dataset):
             train_data.sort(key=lambda x: (10*x[4]+x[5] == 10*x[0]+x[1] or 10*x[4]+x[5] == 10*x[2]+x[3], 
                         10*x[4]+x[5], abs(10*x[0]+x[1]-10*x[2]-x[3])),reverse=True)
             print("Sorted train_data", train_data[:10])
-            train_data = self.interleave_batches(train_data, 64)  # Interleave for batch diversity
+            # train_data = self.interleave_batches(train_data, 64)  # Interleave for batch diversity
             self.data = train_data
             print("Sorted and interleaved train_data", train_data[:10])
         elif split == 'test':
