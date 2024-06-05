@@ -19,13 +19,13 @@ from itertools import permutations
 
 # -----------------------------------------------------------------------------
 
-def get_config():
+def get_config(seed):
     C = CN()
 
     # system
     C.system = CN()
     # TODO: random seed for model can be set here
-    C.system.init_seed = 62 # will change the weight initialization
+    C.system.init_seed = seed # will change the weight initialization
     C.system.work_dir = './test'
 
     # data
@@ -68,11 +68,11 @@ if __name__ == '__main__':
     output_file = "experiment_results_Q2_2_CR.txt"
     with open(output_file, "w") as f_out:
         for i in range(10):  # Run experiment 10 times
-            config = get_config()
+            config = get_config(i)
             setup_logging(config)
             set_seed(config.system.init_seed)  # Change seed for each run
 
-            train_dataset = ChickenRabbitDataset(config.data, split='train', seed=i)
+            train_dataset = ChickenRabbitDataset(config.data, split='train', seed=0)
             test_dataset = ChickenRabbitDataset(config.data, split='test', seed=0)
 
             config.model.vocab_size = train_dataset.get_vocab_size()
