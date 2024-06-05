@@ -65,9 +65,9 @@ class ChickenRabbitDataset(Dataset):
         train_data = data[num_test:]
 
         if split == 'train':
-            train_data.sort(key=lambda x:abs(10 * x[6] + x[7] - 10 * x[8] - x[9]),reverse=True)
+            # train_data.sort(key=lambda x:abs(10 * x[6] + x[7] - 10 * x[8] - x[9]),reverse=True)
             # train_data.sort(key=lambda x: 100*x[3]+10*x[4]+x[5],reverse=True)  # Sort by GCD value
-            train_data = self.interleave_batches(train_data, 64)  # Interleave for batch diversity
+            # train_data = self.interleave_batches(train_data, 64)  # Interleave for batch diversity
             self.data = train_data
             print("Sorted and interleaved train_data", train_data)
         elif split == 'test':
